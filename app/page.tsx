@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
+//1. INTERFACES
+// Review data from Supabase
 interface Review {
   id: string;
   author_name: string;
@@ -10,10 +12,22 @@ interface Review {
   review_text: string;
   status: string;
 }
+// AI-generated responses
+interface AIResponse {
+  professional: string;
+  friendly: string;
+  apology: string;
+}
 
+//2. STATES
 export default function Home() {
+  // Store reviews from database
   const [reviews, setReviews] = useState<Review[]>([]);
+  // Store AI responses by review ID
+  const [aiResponses, setAiResponses] = useState<Record<string, AIResponse>>({});
 
+  //3. FETCH REVIEWS
+  // Fetch all reviews from Supabase
   const fetchReviews = async () => {
     const { data, error } = await supabase
       .from("reviews")
@@ -27,6 +41,8 @@ export default function Home() {
     }
   };
 
+  //4. INSERT SAMPLE REVIEW
+  // Insert sample review into database
   const insertTestReview = async () => {
     const { error } = await supabase
       .from("reviews")
@@ -48,6 +64,36 @@ export default function Home() {
     }
   };
 
+  //5. GENERATE AI
+  // Generate AI responses using OpenAI API
+  const generateAIResponse = async (reviewId: string, reviewText: string) => {
+    try {
+      const response = await fetch(
+        "/api/generate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            reviewText,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      setAiResponses((prev) => ({
+        ...prev,
+        [reviewId]: data,
+      }));
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate AI response");
+    }
+  };
+
+  // Load reviews on first render
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -67,12 +113,14 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Reviews List */}
       <div className="space-y-4">
         {reviews.map((review) => (
           <div
             key={review.id}
             className="border border-gray-700 p-5 rounded-xl"
           >
+            {/* Review Card */}
             <div className="flex justify-between mb-2">
               <h2 className="font-bold text-lg">
                 {review.author_name}
@@ -90,6 +138,65 @@ export default function Home() {
             <span className="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm">
               {review.status}
             </span>
+
+            <div className="mt-4">
+              <button
+                onClick={() =>
+                  generateAIResponse(
+                    review.id,
+                    review.review_text
+                  )
+                }
+                className="bg-blue-500 px-4 py-2 rounded-lg"
+              >
+                Generate AI
+              </button>
+            </div>
+
+            {/* AI Generated Responses */}
+            {aiResponses[review.id] && (
+              <div className="mt-4 space-y-3">
+                <div className="bg-gray-900 p-3 rounded-lg">
+                  <p className="font-bold mb-1">
+                    Professional
+                  </p>
+
+                  <p>
+                    {
+                      aiResponses[review.id]
+                        .professional
+                    }
+                  </p>
+                </div>
+
+                <div className="bg-gray-900 p-3 rounded-lg">
+                  <p className="font-bold mb-1">
+                    Friendly
+                  </p>
+
+                  <p>
+                    {
+                      aiResponses[review.id]
+                        .friendly
+                    }
+                  </p>
+                </div>
+
+                <div className="bg-gray-900 p-3 rounded-lg">
+                  <p className="font-bold mb-1">
+                    Apology
+                  </p>
+
+                  <p>
+                    {
+                      aiResponses[review.id]
+                        .apology
+                    }
+                  </p>
+                </div>
+              </div>
+            )}
+
           </div>
         ))}
       </div>
