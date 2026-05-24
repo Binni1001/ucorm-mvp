@@ -173,7 +173,7 @@ export default function Home() {
             </div>
 
             {/* AI Generated Responses */}
-            {aiResponses[review.id] && (
+            {aiResponses?.[review.id] && (
               <div className="mt-4 space-y-3">
                 <div className="bg-gray-900 p-3 rounded-lg">
                   <p className="font-bold mb-1">
@@ -195,7 +195,7 @@ export default function Home() {
 
                   <p>
                     {
-                      aiResponses[review.id]
+                      aiResponses?.[review.id]
                         .friendly
                     }
                   </p>
@@ -208,7 +208,7 @@ export default function Home() {
 
                   <p>
                     {
-                      aiResponses[review.id]
+                      aiResponses?.[review.id]
                         .apology
                     }
                   </p>
