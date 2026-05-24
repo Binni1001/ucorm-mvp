@@ -93,6 +93,25 @@ export default function Home() {
     }
   };
 
+  // Update review status to Resolved
+  const approveReview = async (
+    reviewId: string
+  ) => {
+    const { error } = await supabase
+      .from("reviews")
+      .update({
+        status: "Resolved",
+      })
+      .eq("id", reviewId);
+
+    if (error) {
+      console.error(error);
+      alert("Failed to approve review");
+    } else {
+      fetchReviews();
+    }
+  };
+
   // Load reviews on first render
   useEffect(() => {
     fetchReviews();
@@ -195,6 +214,17 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            )}
+
+            {review.status === "Pending" && (
+              <button
+                onClick={() =>
+                  approveReview(review.id)
+                }
+                className="mt-2 bg-green-500 text-black px-4 py-2 rounded-lg font-bold"
+              >
+                Approve
+              </button>
             )}
 
           </div>
