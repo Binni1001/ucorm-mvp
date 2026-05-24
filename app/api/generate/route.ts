@@ -1,12 +1,12 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(req: Request) {
   try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const body = await req.json();
 
     const reviewText = body.reviewText;
@@ -31,16 +31,17 @@ Return ONLY valid JSON in this format:
 }
 `;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-    });
+    const completion =
+      await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+      });
 
     const content =
       completion.choices[0].message.content;
@@ -52,8 +53,13 @@ Return ONLY valid JSON in this format:
     console.error(error);
 
     return NextResponse.json(
-      { error: "Failed to generate AI response" },
-      { status: 500 }
+      {
+        error:
+          "Failed to generate AI response",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
