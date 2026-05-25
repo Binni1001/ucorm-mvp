@@ -110,6 +110,60 @@ export default function Home() {
     }
   };
 
+  //6. IMPORT REVIEWS
+  const importReviews = async () => {
+    try {
+      const response = await fetch(
+        "/api/import-reviews",
+        {
+          method: "POST",
+        }
+      );
+
+      const data = await response.json();
+
+      for (const review of data) {
+        // Check duplicate review
+        const { data: existingReview } =
+          await supabase
+            .from("reviews")
+            .select()
+            .eq(
+              "review_text",
+              review.review_text
+            )
+            .single();
+
+        // Skip if review already exists
+        if (existingReview) {
+          continue;
+        }
+
+        // Insert new review
+        await supabase
+          .from("reviews")
+          .insert([
+            {
+              place_id: "mock-place",
+              author_name:
+                review.author_name,
+              rating: review.rating,
+              review_text:
+                review.review_text,
+            },
+          ]);
+      }
+
+      fetchReviews();
+
+      alert("Reviews imported!");
+    } catch (error) {
+      console.error(error);
+
+      alert("Import failed");
+    }
+  };
+
   // Update review status to Resolved
   const approveReview = async (
     reviewId: string,
@@ -153,28 +207,16 @@ export default function Home() {
       key: "professional" as keyof AIResponse,
       label: "Professional",
       icon: "💼",
-      accent: "from-slate-500 to-slate-700",
-      bg: "bg-slate-50 dark:bg-slate-900/40",
-      border: "border-slate-200 dark:border-slate-700",
-      badge: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
     },
     {
       key: "friendly" as keyof AIResponse,
       label: "Friendly",
       icon: "😊",
-      accent: "from-sky-500 to-blue-600",
-      bg: "bg-sky-50 dark:bg-sky-900/20",
-      border: "border-sky-200 dark:border-sky-800",
-      badge: "bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300",
     },
     {
       key: "apology" as keyof AIResponse,
       label: "Apology",
       icon: "🙏",
-      accent: "from-amber-500 to-orange-500",
-      bg: "bg-amber-50 dark:bg-amber-900/20",
-      border: "border-amber-200 dark:border-amber-800",
-      badge: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
     },
   ];
 
@@ -252,6 +294,12 @@ export default function Home() {
           margin-top: 1px;
         }
 
+        .topbar-actions {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+
         .add-btn {
           display: flex;
           align-items: center;
@@ -277,6 +325,33 @@ export default function Home() {
         }
 
         .add-btn:active { transform: translateY(0); }
+
+        .import-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 20px;
+          background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.18));
+          border: 1px solid rgba(99,102,241,0.35);
+          border-radius: 10px;
+          color: #a5b4fc;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .import-btn:hover {
+          background: linear-gradient(135deg, rgba(99,102,241,0.28), rgba(139,92,246,0.28));
+          border-color: rgba(99,102,241,0.55);
+          color: #c7d2fe;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 16px rgba(99,102,241,0.2);
+        }
+
+        .import-btn:active { transform: translateY(0); }
 
         .content {
           max-width: 860px;
@@ -593,9 +668,7 @@ export default function Home() {
         .ai-card.friendly .ai-card-label { color: #38bdf8; }
         .ai-card.apology .ai-card-label { color: #fbbf24; }
 
-        .ai-card-icon {
-          font-size: 14px;
-        }
+        .ai-card-icon { font-size: 14px; }
 
         .approve-btn {
           display: inline-flex;
@@ -616,7 +689,6 @@ export default function Home() {
           background: rgba(100,116,139,0.2);
           color: #cbd5e1;
         }
-
         .ai-card.professional .approve-btn:hover {
           background: rgba(100,116,139,0.35);
           transform: scale(1.03);
@@ -626,7 +698,6 @@ export default function Home() {
           background: rgba(14,165,233,0.15);
           color: #7dd3fc;
         }
-
         .ai-card.friendly .approve-btn:hover {
           background: rgba(14,165,233,0.28);
           transform: scale(1.03);
@@ -636,7 +707,6 @@ export default function Home() {
           background: rgba(245,158,11,0.15);
           color: #fcd34d;
         }
-
         .ai-card.apology .approve-btn:hover {
           background: rgba(245,158,11,0.28);
           transform: scale(1.03);
@@ -665,7 +735,9 @@ export default function Home() {
         }
 
         @media (max-width: 600px) {
-          .topbar { padding: 20px 16px; }
+          .topbar { padding: 20px 16px; flex-wrap: wrap; gap: 12px; }
+          .topbar-actions { width: 100%; }
+          .add-btn, .import-btn { flex: 1; justify-content: center; }
           .content { padding: 24px 16px 0; }
           .stats-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
           .stat-value { font-size: 22px; }
@@ -683,10 +755,16 @@ export default function Home() {
             </div>
           </div>
 
-          <button onClick={insertTestReview} className="add-btn">
-            <span>＋</span>
-            Add Test Review
-          </button>
+          <div className="topbar-actions">
+            <button onClick={insertTestReview} className="add-btn">
+              <span>＋</span>
+              Add Test Review
+            </button>
+            <button onClick={importReviews} className="import-btn">
+              <span>↓</span>
+              Import Reviews
+            </button>
+          </div>
         </div>
 
         <div className="content">
@@ -784,7 +862,7 @@ export default function Home() {
                 {/* AI Generated Responses */}
                 {aiResponses?.[review.id] && (
                   <div className="ai-responses">
-                    {responseTypes.map(({ key, label, icon, ...styles }) => (
+                    {responseTypes.map(({ key, label, icon }) => (
                       <div key={key} className={`ai-card ${key}`}>
                         <div className="ai-card-header">
                           <div className="ai-card-label">
