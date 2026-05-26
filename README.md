@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Powered ORM Dashboard
 
-## Getting Started
+An AI-powered hotel review management dashboard built with Next.js, Supabase, and OpenAI.
 
-First, run the development server:
+This project allows hotel staff to:
+- manage customer reviews
+- generate AI-powered responses
+- approve official responses
+- simulate importing Google reviews
+- store approved replies in a database
+
+---
+
+# Features
+
+## AI Response Generation
+Generate 3 response styles:
+- Professional
+- Friendly
+- Apology-focused
+
+using OpenAI API.
+
+---
+
+## Review Approval Workflow
+Staff can:
+- approve AI-generated responses
+- save approved replies to database
+- manage review status
+
+---
+
+## Import Reviews
+Simulate importing Google reviews using a mock API route.
+
+Imported reviews are automatically stored in Supabase.
+
+---
+
+## Modern Dashboard UI
+- dark mode UI
+- loading states
+- responsive layout
+- SaaS-inspired dashboard design
+
+---
+
+# Tech Stack
+
+- Next.js 16
+- TypeScript
+- Supabase
+- OpenAI API
+- Vercel
+- CSS Modules
+
+---
+
+# Project Architecture
+
+Frontend (Next.js)
+↓
+API Routes
+↓
+OpenAI / Mock Reviews API
+↓
+Supabase Database
+
+---
+
+# Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+# Installation
+
+```bash
+npm install
+```
+
+---
+
+# Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Build Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+# Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is deployed on Vercel.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+# Future Improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Real Google Places API integration
+- Authentication system
+- Analytics dashboard
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+# Author
+
+Duong Tuan Kiet
